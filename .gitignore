@@ -1,0 +1,5 @@
+.streamlit/secrets.toml
+.DS_Store
+.devcontainer
+__pycache__
+.devcontainer
