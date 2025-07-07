@@ -1,0 +1,7 @@
+users:
+  - name: JACKSON
+    default_role: ANALYST
+    default_warehouse: COMPUTE_WH
+    disabled: false
+    must_change_password: true
+    comment: Jackson User Setup
