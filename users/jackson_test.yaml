@@ -1,7 +1,0 @@
-users:
-- name: JACKSON_TEST
-  default_role: PUBLIC
-  default_warehouse: COMPUTE_WH
-  disabled: false
-  must_change_password: false
-  comment: Jackson Test

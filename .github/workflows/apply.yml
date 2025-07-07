@@ -3,7 +3,7 @@ name: Apply Snowflake YAML
 on:
   push:
     branches:
-      - main
+      - main  # Triggers on any push to the main branch
 
 jobs:
   apply:
@@ -21,8 +21,7 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           pip install snowflake-connector-python ruamel.yaml
-
-      - name: 🔐 Apply YAML to Snowflake
+      - name: 🚀 Apply YAML to Snowflake
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
