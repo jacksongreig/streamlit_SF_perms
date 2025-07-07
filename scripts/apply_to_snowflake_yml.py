@@ -53,9 +53,9 @@ for filepath in yaml_files:
 
         try:
             cs.execute(stmt)
-            print(f"✅ User '{name}' applied successfully.")
+            print(f"User '{name}' applied successfully.")
         except Exception as e:
-            print(f"❌ Error applying user '{name}': {e}")
+            print(f"Error applying user '{name}': {e}")
 
 cs.close()
 conn.close()

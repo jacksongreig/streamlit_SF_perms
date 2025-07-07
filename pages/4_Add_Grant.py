@@ -45,7 +45,6 @@ st.markdown("""
 yaml = YAML()
 
 with st.container():
-    st.markdown('<div class="tool-container">', unsafe_allow_html=True)
     st.header("Add New Snowflake Grant")
 
     col1, col2 = st.columns(2)
