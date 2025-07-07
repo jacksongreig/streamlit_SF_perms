@@ -4,4 +4,4 @@ users:
   default_warehouse: COMPUTE_WH
   disabled: false
   must_change_password: true
-  comment: Test 2
+  comment: TEST 2
