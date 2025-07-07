@@ -45,6 +45,7 @@ st.markdown("""
 yaml = YAML()
 
 with st.container():
+    st.markdown('<div class="tool-container">', unsafe_allow_html=True)
     st.header("Add New Snowflake Warehouse")
 
     wh_name = st.text_input("Warehouse Name", placeholder="e.g. DEV_WH")

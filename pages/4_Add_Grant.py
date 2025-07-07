@@ -3,10 +3,8 @@ from ruamel.yaml import YAML
 from io import StringIO
 from utils.github_integration import raise_github_pr
 
-# ========== Page Setup ==========
 st.set_page_config(page_title="Add New Grant", layout="centered")
 
-# ========== Styling ==========
 st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
@@ -35,28 +33,17 @@ st.markdown("""
         color: white !important;
         font-size: 1.05rem;
         font-weight: 600;
-        border: none;
         border-radius: 10px;
-        transition: background-color 0.3s ease;
-    }
-
-    .stButton > button:hover {
-        background-color: #005599 !important;
     }
 
     .stCodeBlock pre {
         background-color: #f4f4f4 !important;
-        color: #333 !important;
-        font-size: 0.9rem;
-        border-radius: 8px;
-        padding: 1rem;
     }
     </style>
 """, unsafe_allow_html=True)
 
 yaml = YAML()
 
-# ========== Page Content ==========
 with st.container():
     st.markdown('<div class="tool-container">', unsafe_allow_html=True)
     st.header("Add New Snowflake Grant")

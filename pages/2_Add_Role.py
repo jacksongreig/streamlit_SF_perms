@@ -45,6 +45,7 @@ st.markdown("""
 yaml = YAML()
 
 with st.container():
+    st.markdown('<div class="tool-container">', unsafe_allow_html=True)
     st.header("Add New Snowflake Role")
 
     role_name = st.text_input("Role Name", placeholder="e.g. ANALYST")
