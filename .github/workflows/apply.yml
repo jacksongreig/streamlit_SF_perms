@@ -3,26 +3,27 @@ name: Apply Snowflake YAML
 on:
   push:
     branches:
-      - main  # Triggers on any push to the main branch
+      - main
 
 jobs:
   apply:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: 🐍 Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: 3.10
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         run: |
+          pip install -r requirements.txt
           pip install snowflake-connector-python ruamel.yaml
 
-      - name: 🚀 Apply YAML to Snowflake
+      - name: Apply only changed YAML
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
