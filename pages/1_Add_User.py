@@ -1,6 +1,8 @@
 import streamlit as st
 from ruamel.yaml import YAML
 from io import StringIO
+from github import Github
+from datetime import datetime
 
 # ========== Page Setup ==========
 st.set_page_config(page_title="Add New User", layout="centered")
@@ -11,7 +13,6 @@ st.markdown("""
     [data-testid="stAppViewContainer"] {
         background-color: #f0f2f6;
     }
-
     .tool-container {
         max-width: 800px;
         margin: 0 auto;
@@ -21,42 +22,11 @@ st.markdown("""
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
-
-    /* Form field labels */
     label, .stTextInput label, .stSelectbox label {
         color: #1a1a1a !important;
         font-weight: 600 !important;
         font-size: 0.95rem !important;
     }
-
-    /* Checkbox label */
-    .stCheckbox > label {
-        color: #1a1a1a !important;
-        font-weight: 500 !important;
-    }
-
-    /* Code block (YAML preview) */
-    .stCodeBlock pre {
-        background-color: #f4f4f4 !important;
-        color: #333333 !important;
-        font-size: 0.9rem;
-        border-radius: 8px;
-        padding: 1rem;
-    }
-
-    /* Section headers */
-    h1, h2, h3 {
-        color: #003366 !important;
-        font-weight: 700 !important;
-    }
-
-    .stMarkdown h2 {
-        font-size: 1.25rem;
-        color: #003366 !important;
-        margin-top: 2rem;
-    }
-
-    /* Buttons */
     .stButton > button {
         width: 100%;
         min-height: 60px;
@@ -68,12 +38,10 @@ st.markdown("""
         border-radius: 10px;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
-
     .stButton > button:hover {
         background-color: #005599 !important;
         color: white !important;
     }
-
     .stButton > button:active {
         background-color: #001f3f !important;
         color: white !important;
@@ -81,43 +49,81 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ========== YAML Setup ==========
+# ========== YAML Builder ==========
+st.header("Add New Snowflake User")
+
+username = st.text_input("Username", placeholder="e.g. jack.greig").strip()
+default_role = st.text_input("Default Role", placeholder="e.g. ANALYST").strip().upper()
+default_warehouse = st.text_input("Default Warehouse", placeholder="e.g. COMPUTE_WH").strip().upper()
+disabled = st.checkbox("User is disabled")
+
+# Optional settings
+must_change_password = st.checkbox("User must change password on next login", value=True)
+comment = st.text_input("Comment (optional)")
+
+# ========== Build YAML ==========
 yaml = YAML()
+yaml.indent(mapping=2, sequence=4, offset=2)
 
-# ========== Main Content ==========
-with st.container():
-    st.header("Add New Snowflake User")
+user_yaml = {
+    "users": [
+        {
+            "name": username,
+            "default_role": default_role,
+            "default_warehouse": default_warehouse,
+            "disabled": disabled,
+            "must_change_password": must_change_password,
+        }
+    ]
+}
+if comment:
+    user_yaml["users"][0]["comment"] = comment
 
-    col1, col2 = st.columns(2)
-    with col1:
-        username = st.text_input("Username", placeholder="e.g. john_doe")
-        default_role = st.text_input("Default Role", placeholder="e.g. ANALYST")
-    with col2:
-        default_warehouse = st.text_input("Default Warehouse", placeholder="e.g. COMPUTE_WH")
-        must_change_password = st.selectbox("Require password change on login?", ["true", "false"])
+# ========== Preview ==========
+st.subheader("🧾 YAML Preview")
+yaml_stream = StringIO()
+yaml.dump(user_yaml, yaml_stream)
+st.code(yaml_stream.getvalue(), language='yaml')
 
-    disabled = st.checkbox("User is disabled?", value=False)
+# ========== GitHub PR Function ==========
+def raise_github_pr(filename, file_contents):
+    token = st.secrets["GITHUB_TOKEN"]
+    repo_name = st.secrets["GITHUB_REPO"]
 
-    # YAML Preview
-    st.subheader("YAML Preview")
+    g = Github(token)
+    repo = g.get_repo(repo_name)
 
-    user_yaml = {
-        'users': [
-            {
-                'name': username,
-                'default_role': default_role,
-                'default_warehouse': default_warehouse,
-                'must_change_password': must_change_password == "true",
-                'disabled': disabled
-            }
-        ]
-    }
+    base_branch = repo.default_branch
+    timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+    branch_name = f"feature/{filename.replace('/', '_').replace('.yaml','')}_{timestamp}"
 
-    yaml_stream = StringIO()
-    yaml.dump(user_yaml, yaml_stream)
-    st.code(yaml_stream.getvalue(), language='yaml')
+    base = repo.get_branch(base_branch)
+    repo.create_git_ref(ref=f"refs/heads/{branch_name}", sha=base.commit.sha)
 
-    if st.button("Submit & Raise Pull Request"):
-        st.success("Stub: This would push to GitHub and raise a PR.")
+    repo.create_file(
+        path=filename,
+        message=f"add: {filename}",
+        content=file_contents,
+        branch=branch_name
+    )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    pr = repo.create_pull(
+        title=f"feat: add {filename}",
+        body="Auto-generated from the Snowflake IaC Assistant.",
+        head=branch_name,
+        base=base_branch
+    )
+
+    return pr.html_url
+
+# ========== Submit ==========
+if st.button("🚀 Submit & Raise Pull Request"):
+    if not username or not default_role or not default_warehouse:
+        st.error("Please fill in all required fields.")
+    else:
+        filename = f"users/{username.replace('.', '_').lower()}.yaml"
+        try:
+            pr_url = raise_github_pr(filename, yaml_stream.getvalue())
+            st.success(f"✅ Pull Request created: [View PR]({pr_url})")
+        except Exception as e:
+            st.error(f"❌ Failed to create PR: {e}")
