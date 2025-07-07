@@ -1,0 +1,6 @@
+warehouses:
+- name: TEST_WH
+  size: X-Small
+  auto_suspend: 60
+  auto_resume: true
+  comment: TEST WH Practiv TEST
