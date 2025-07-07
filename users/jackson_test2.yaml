@@ -1,0 +1,7 @@
+users:
+- name: JACKSON_TEST2
+  default_role: PUBLIC
+  default_warehouse: COMPUTE_WH
+  disabled: false
+  must_change_password: true
+  comment: Test 2
