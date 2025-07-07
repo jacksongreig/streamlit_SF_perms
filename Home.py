@@ -1,6 +1,5 @@
 import streamlit as st
 
-# ========== Page Setup ==========
 st.set_page_config(
     page_title="Snowflake IaC Assistant",
     page_icon="",
@@ -8,7 +7,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ========== Styling ==========
 st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
@@ -50,7 +48,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ========== App Header ==========
 with st.container():
     st.markdown("""
         <div class="home-container">
@@ -61,7 +58,6 @@ with st.container():
         </div>
     """, unsafe_allow_html=True)
 
-# ========== Navigation Buttons ==========
 st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 

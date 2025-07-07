@@ -4,7 +4,6 @@ import glob
 from ruamel.yaml import YAML
 import snowflake.connector # type: ignore
 
-# === Load YAML files ===
 yaml = YAML()
 yaml_files = glob.glob("users/*.yaml")
 
@@ -12,7 +11,6 @@ if not yaml_files:
     print("No YAML files found in /users folder.")
     exit(0)
 
-# === Connect to Snowflake ===
 conn = snowflake.connector.connect(
     account=os.environ["SNOWFLAKE_ACCOUNT"],
     user=os.environ["SNOWFLAKE_USER"],
@@ -25,7 +23,6 @@ conn = snowflake.connector.connect(
 
 cs = conn.cursor()
 
-# === Apply users ===
 for filepath in yaml_files:
     print(f"🔍 Processing {filepath}")
     with open(filepath, "r") as f:

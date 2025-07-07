@@ -85,8 +85,8 @@ with st.container():
                 token=st.secrets["GITHUB_TOKEN"],
                 repo_name=st.secrets["GITHUB_REPO"]
             )
-            st.success(f"✅ Pull Request created: [View PR]({pr_url})")
+            st.success(f"Pull Request created: [View PR]({pr_url})")
         except Exception as e:
-            st.error(f"❌ Failed to create PR: {e}")
+            st.error(f"Failed to create PR: {e}")
 
     st.markdown("</div>", unsafe_allow_html=True)

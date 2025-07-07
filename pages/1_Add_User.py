@@ -3,10 +3,8 @@ from ruamel.yaml import YAML
 from io import StringIO
 from utils.github_integration import raise_github_pr
 
-# ========== Page Setup ==========
 st.set_page_config(page_title="Add New User", layout="centered")
 
-# ========== Custom Styling ==========
 st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
@@ -54,10 +52,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ========== YAML Setup ==========
 yaml = YAML()
 
-# ========== Page Layout ==========
 with st.container():
     st.header("Add New Snowflake User")
 
@@ -99,8 +95,8 @@ with st.container():
                 token=st.secrets["GITHUB_TOKEN"],
                 repo_name=st.secrets["GITHUB_REPO"]
             )
-            st.success(f"✅ Pull Request created: [View PR]({pr_url})")
+            st.success(f"Pull Request created: [View PR]({pr_url})")
         except Exception as e:
-            st.error(f"❌ Failed to create PR: {e}")
+            st.error(f"Failed to create PR: {e}")
 
     st.markdown("</div>", unsafe_allow_html=True)
