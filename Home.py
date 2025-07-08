@@ -51,19 +51,20 @@ st.markdown("""
 with st.container():
     st.markdown("""
         <div class="home-container">
+            <div style="font-size: 4rem; text-align: center;">🧑‍🧒</div>
             <h1>Snowflake IaC Assistant</h1>
             <p>
-                This tool helps you manage Snowflake users, roles, warehouses and grants.<br>
+                This tool helps you manage Snowflake users, roles, warehouses and grants<br>
             </p>
-        </div>
+    </div>
     """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("Add New User"):
-        st.switch_page("pages/1_Add_User.py")
+    if st.button("Create New User"):
+        st.switch_page("pages/1_Create_New_User.py")
 
     if st.button("Add Warehouse"):
         st.switch_page("pages/3_Add_Warehouse.py")

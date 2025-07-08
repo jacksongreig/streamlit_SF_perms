@@ -2,50 +2,20 @@ import streamlit as st
 from ruamel.yaml import YAML
 from io import StringIO
 from utils.github_integration import raise_github_pr
+from utils.shared_css import inject_shared_css
 
-st.set_page_config(page_title="Add New Grant", layout="centered")
+st.set_page_config(
+    page_title="Add Grant",
+    page_icon="",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-st.markdown("""
-    <style>
-    [data-testid="stAppViewContainer"] {
-        background-color: #f0f2f6;
-    }
-
-    .tool-container {
-        max-width: 800px;
-        margin: 0 auto;
-        background-color: #ffffff;
-        color: #000000;
-        padding: 2.5rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    h1, h2 {
-        color: #003366 !important;
-        font-weight: 700;
-    }
-
-    .stButton > button {
-        width: 100%;
-        min-height: 60px;
-        background-color: #003366 !important;
-        color: white !important;
-        font-size: 1.05rem;
-        font-weight: 600;
-        border-radius: 10px;
-    }
-
-    .stCodeBlock pre {
-        background-color: #f4f4f4 !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
+inject_shared_css()
 yaml = YAML()
 
 with st.container():
-    st.header("Add New Snowflake Grant")
+    st.markdown('<h1 style="text-align: center;">Add Grant</h1>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -76,7 +46,7 @@ with st.container():
     yaml.dump(grant_yaml, yaml_stream)
     st.code(yaml_stream.getvalue(), language='yaml')
 
-    if st.button("🚀 Submit & Raise Pull Request"):
+    if st.button("Submit & Raise PR"):
         try:
             filename = f"grants/{role.lower()}_{privilege.lower()}.yaml"
             pr_url = raise_github_pr(
@@ -85,8 +55,6 @@ with st.container():
                 token=st.secrets["GITHUB_TOKEN"],
                 repo_name=st.secrets["GITHUB_REPO"]
             )
-            st.success(f"Pull Request created: [View PR]({pr_url})")
+            st.success(f"PR created: [View PR]({pr_url})")
         except Exception as e:
             st.error(f"Failed to create PR: {e}")
-
-    st.markdown("</div>", unsafe_allow_html=True)
