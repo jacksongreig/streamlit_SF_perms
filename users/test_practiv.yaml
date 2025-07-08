@@ -1,0 +1,14 @@
+users:
+- name: TEST_PRACTIV
+  default_role: PUBLIC
+  default_warehouse: COMPUTE_WH
+  disabled: false
+  display_name: TEST
+  email: test@gmail.com
+  first_name: TEST
+  last_name: PRACTIV
+  login_name: TEST_PRACTIV
+  must_change_password: false
+  owner: ACCOUNTADMIN
+  type: PERSON
+  password: '123'
