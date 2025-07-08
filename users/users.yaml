@@ -1,14 +1,14 @@
 users:
-  - name: TEST_PRACTIV
+  - name: TEST2
     default_role: PUBLIC
     default_warehouse: COMPUTE_WH
     disabled: false
-    display_name: TEST
-    email: test@gmail.com
-    first_name: TEST
-    last_name: TEST
-    login_name: TEST_PRACTIV
+    display_name: TEST2
+    email: TEST2@gmail.com
+    first_name: TEST2
+    last_name: TEST2
+    login_name: TEST2
     must_change_password: true
     owner: ACCOUNTADMIN
     type: PERSON
-    password: '2123'
+    password: '1234'
