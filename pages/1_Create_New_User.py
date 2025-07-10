@@ -29,7 +29,7 @@ with col2:
         st.session_state.user_mode = "edit"
 
 st.markdown("---")
-st.markdown(f"<h3 style='text-align: center;'>{'Create New User' if st.session_state.user_mode == 'create' else 'Edit User'}</h3>", unsafe_allow_html=True)
+st.markdown(f"<h3 style='text-align: center;'>{'Create New User' if st.session_state.user_mode == 'create' else 'Edit Existing User'}</h3>", unsafe_allow_html=True)
 
 # --- FETCH USER DATA ---
 @st.cache_data
