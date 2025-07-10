@@ -3,3 +3,4 @@
 .devcontainer
 __pycache__
 .devcontainer
+streamlit_app.yaml

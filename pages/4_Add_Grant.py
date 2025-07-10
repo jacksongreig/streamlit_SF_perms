@@ -1,11 +1,11 @@
 import streamlit as st
 from ruamel.yaml import YAML
 from io import StringIO
-from utils.github_integration import raise_github_pr
+#from utils.github_integration import raise_github_pr
 from utils.shared_css import inject_shared_css
 
 st.set_page_config(
-    page_title="Add Grant",
+    page_title="Grants",
     page_icon="",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -15,7 +15,7 @@ inject_shared_css()
 yaml = YAML()
 
 with st.container():
-    st.markdown('<h1 style="text-align: center;">Add Grant</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="text-align: center;">Grants</h1>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:

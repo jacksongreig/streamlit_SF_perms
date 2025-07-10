@@ -1,4 +1,9 @@
 name: streamlit
 dependencies:
-  - python=3.10
-  - streamlit
+  - httpx=0.28.1
+  - pygithub=2.4.0
+  - python=3.11.*
+  - ruamel=1.0
+  - ruamel.yaml=0.18.10
+  - snowflake-snowpark-python=
+  - streamlit=

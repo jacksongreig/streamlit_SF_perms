@@ -1,12 +1,14 @@
 import streamlit as st
 
+# --- PAGE CONFIG ---
 st.set_page_config(
     page_title="Snowflake IaC Assistant",
-    page_icon="",
+    page_icon="🧑‍🧒",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
+# --- CUSTOM CSS ---
 st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
@@ -48,30 +50,40 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- HEADER BOX ---
 with st.container():
     st.markdown("""
         <div class="home-container">
-            <div style="font-size: 4rem; text-align: center;">🧑‍🧒</div>
+            <div style="font-size: 4rem;">🧑‍🧒</div>
             <h1>Snowflake IaC Assistant</h1>
-            <p>
-                This tool helps you manage Snowflake users, roles, warehouses and grants<br>
-            </p>
-    </div>
+            <p>This tool helps you manage Snowflake users, roles, warehouses, and grants via Infrastructure as Code (IaC).</p>
+        </div>
     """, unsafe_allow_html=True)
 
+# --- SPACING ---
 st.markdown("<br>", unsafe_allow_html=True)
+
+# --- NAVIGATION BUTTONS ---
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("Create New User"):
+    if st.button("Users"):
         st.switch_page("pages/1_Create_New_User.py")
 
-    if st.button("Add Warehouse"):
+    if st.button("Warehouses"):
         st.switch_page("pages/3_Add_Warehouse.py")
 
 with col2:
-    if st.button("Add Role"):
+    if st.button("Roles"):
         st.switch_page("pages/2_Add_Role.py")
 
-    if st.button("Add Grant"):
+    if st.button("Grants"):
         st.switch_page("pages/4_Add_Grant.py")
+
+# --- FOOTER ---
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("""
+    <div style='text-align: center; color: grey; font-size: 0.85rem; padding: 1rem 0;'>
+        © 2025 Created by Practiv
+    </div>
+""", unsafe_allow_html=True)
