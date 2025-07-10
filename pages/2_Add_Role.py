@@ -5,7 +5,6 @@ from io import StringIO
 # from utils.github_integration import raise_github_pr
 from utils.shared_css import inject_shared_css
 
-# --- SETUP ---
 st.set_page_config(page_title="Roles", layout="centered", initial_sidebar_state="collapsed")
 inject_shared_css()
 session = get_active_session()
@@ -17,7 +16,6 @@ yaml.allow_unicode = True
 if "role_mode" not in st.session_state:
     st.session_state.role_mode = "create"
 
-# --- HEADER ---
 st.markdown('<h1 style="text-align: center;">Roles</h1>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -34,7 +32,6 @@ st.markdown("---")
 
 st.markdown(f"<h3 style='text-align: center;'>{'Create' if st.session_state.role_mode == 'create' else 'Edit'}</h3>", unsafe_allow_html=True)
 
-# --- FETCH ROLES ---
 @st.cache_data
 def get_existing_roles():
     df = session.sql("SELECT name FROM SNOWFLAKE.ACCOUNT_USAGE.ROLES ORDER BY name").to_pandas()
@@ -56,7 +53,6 @@ def get_role_details(role_name: str):
         "comment": row["COMMENT"]
     }
 
-# --- LOAD FORM DATA ---
 role_info = {}
 if st.session_state.role_mode == "edit":
     roles = get_existing_roles()
@@ -64,14 +60,12 @@ if st.session_state.role_mode == "edit":
     if selected_role:
         role_info = get_role_details(selected_role)
 
-# --- FORM FIELDS ---
 role_name = st.text_input("*Role Name", value=role_info.get("name", ""), placeholder="e.g. ANALYST")
 comment = st.text_area("Comment (optional)", value=role_info.get("comment", ""), placeholder="Describe the role or leave blank")
 owner_options = ["SECURITYADMIN", "ACCOUNTADMIN"]
 owner_default = 0 if role_info.get("owner", "ACCOUNTADMIN") == "SECURITYADMIN" else 1
 owner = st.selectbox("*Owner", options=owner_options, index=owner_default)
 
-# --- YAML PREVIEW (CREATE/EDIT) ---
 role_name_clean = role_name.strip()
 comment_clean = comment.strip()
 
@@ -86,14 +80,15 @@ role_yaml = {"roles": [role_data]}
 yaml_stream = StringIO()
 yaml.dump(role_yaml, yaml_stream)
 
-st.subheader("YAML Preview")
+st.markdown("---")
+
+st.markdown('<h3 style="text-align: center;">User YAML Preview</h1>', unsafe_allow_html=True)
+
 st.code(yaml_stream.getvalue(), language="yaml")
 
-# --- SUBMIT & DELETE ---
 submit_label = "Submit & Raise PR" if st.session_state.role_mode == "create" else "Update & Raise PR"
 col_submit, col_delete = st.columns([2, 1])
 
-# --- SUBMIT BUTTON ---
 if st.button(submit_label):
     if not role_name_clean:
         st.error("Role Name is required.")
@@ -113,7 +108,6 @@ if st.button(submit_label):
         except Exception as e:
             st.error(f"Failed to Raise PR: {e}")
 
-# --- DELETE VIA PR BUTTON ---
 if st.session_state.role_mode == "edit" and role_info:
     with col_delete:
         if st.button("Delete Role", type="secondary"):

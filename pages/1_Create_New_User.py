@@ -5,7 +5,6 @@ from io import StringIO
 from utils.shared_css import inject_shared_css
 from utils.github_integration import raise_github_pr
 
-# --- CONFIG ---
 st.set_page_config(page_title="Users", layout="centered", initial_sidebar_state="collapsed")
 inject_shared_css()
 session = get_active_session()
@@ -16,7 +15,6 @@ yaml.default_flow_style = False
 if "user_mode" not in st.session_state:
     st.session_state.user_mode = "create"
 
-# --- HEADER ---
 st.markdown('<h1 style="text-align: center;">Users</h1>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -31,7 +29,6 @@ with col2:
 st.markdown("---")
 st.markdown(f"<h3 style='text-align: center;'>{'Create New User' if st.session_state.user_mode == 'create' else 'Edit Existing User'}</h3>", unsafe_allow_html=True)
 
-# --- FETCH USER DATA ---
 @st.cache_data
 def get_existing_users():
     df = session.sql("""
@@ -65,7 +62,6 @@ def get_user_details(user_name: str):
         "comment": row["COMMENT"]
     }
 
-# --- LOAD USER DATA ---
 user_info = {}
 selected_user = None
 if st.session_state.user_mode == "edit":
@@ -74,7 +70,6 @@ if st.session_state.user_mode == "edit":
     if selected_user:
         user_info = get_user_details(selected_user)
 
-# --- FORM FIELDS ---
 col1, col2 = st.columns(2)
 
 with col1:
@@ -102,12 +97,10 @@ with col2:
 rsa_public_key = st.text_input("RSA Public Key (optional)")
 comment = st.text_area("Comment (optional)")
 
-# --- DISPLAY NAME LOGIC ---
 display_name = display_name_input.strip()
 if not display_name and first_name.strip() and last_name.strip():
     display_name = f"{first_name.strip()} {last_name.strip()}"
 
-# --- BUILD CLEANED USER OBJECT ---
 user_data = {
     "name": name.strip(),
     "comment": comment.strip() or None,
@@ -133,14 +126,15 @@ if user_type == "PERSON":
 
 user_data_cleaned = {k: v for k, v in user_data.items() if v is not None}
 
-# --- YAML PREVIEW ---
+st.markdown("---")
+
 yaml_stream = StringIO()
 yaml.dump({"users": [user_data_cleaned]}, yaml_stream)
 
-st.subheader("User YAML Preview")
+st.markdown('<h3 style="text-align: center;">User YAML Preview</h1>', unsafe_allow_html=True)
+
 st.code(yaml_stream.getvalue(), language="yaml")
 
-# --- SUBMIT / UPDATE / DELETE ---
 def submit_to_github():
     from utils.github_integration import read_users_yml_from_github
     existing_str = read_users_yml_from_github()
@@ -198,7 +192,6 @@ else:
             except Exception as e:
                 st.error(f"Failed to raise delete PR: {e}")
 
-# --- FOOTER ---
 st.markdown("---", unsafe_allow_html=True)
 st.markdown("""
     <div style='text-align: center; color: grey; font-size: 0.85rem; padding: 1rem 0;'>

@@ -41,7 +41,10 @@ with st.container():
         ]
     }
 
-    st.subheader("YAML Preview")
+    st.markdown("---")
+    
+    st.markdown('<h3 style="text-align: center;">User YAML Preview</h1>', unsafe_allow_html=True)
+
     yaml_stream = StringIO()
     yaml.dump(grant_yaml, yaml_stream)
     st.code(yaml_stream.getvalue(), language='yaml')

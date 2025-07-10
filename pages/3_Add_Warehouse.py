@@ -5,7 +5,6 @@ from io import StringIO
 # from utils.github_integration import raise_github_pr
 from utils.shared_css import inject_shared_css
 
-# --- SETUP ---
 st.set_page_config(page_title="Warehouses", layout="centered", initial_sidebar_state="collapsed")
 
 inject_shared_css()
@@ -18,7 +17,6 @@ yaml.allow_unicode = True
 if "warehouse_mode" not in st.session_state:
     st.session_state.warehouse_mode = "create"
 
-# --- HEADER ---
 st.markdown('<h1 style="text-align: center;">Warehouses</h1>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -35,7 +33,6 @@ st.markdown("---")
 
 st.markdown(f"<h3 style='text-align: center;'>{'Create' if st.session_state.warehouse_mode == 'create' else 'Edit'}</h3>", unsafe_allow_html=True)
 
-# --- FETCH EXISTING WAREHOUSES ---
 @st.cache_data
 def get_existing_warehouses():
     df = session.sql("SELECT name FROM SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSES ORDER BY name").to_pandas()
@@ -57,7 +54,6 @@ def get_warehouse_details(wh_name: str):
     row = df.iloc[0]
     return {col.lower(): row[col] for col in df.columns}
 
-# --- LOAD DATA IF EDITING ---
 wh_info = {}
 if st.session_state.warehouse_mode == "edit":
     wh_list = get_existing_warehouses()
@@ -65,7 +61,6 @@ if st.session_state.warehouse_mode == "edit":
     if selected_wh:
         wh_info = get_warehouse_details(selected_wh)
 
-# --- FORM ---
 col1, col2 = st.columns(2)
 with col1:
     wh_name = st.text_input("*Warehouse Name", value=wh_info.get("name", ""), placeholder="e.g. DEV_WH")
@@ -93,7 +88,6 @@ with col2:
 
 comment = st.text_area("Comment (optional)", value=wh_info.get("comment", ""))
 
-# --- YAML BUILD ---
 warehouse_data = {
     "name": wh_name.strip(),
     "warehouse_size": warehouse_size,
@@ -117,14 +111,15 @@ warehouse_yaml = {"warehouses": [warehouse_data]}
 yaml_stream = StringIO()
 yaml.dump(warehouse_yaml, yaml_stream)
 
-st.subheader("YAML Preview")
+st.markdown("---")
+
+st.markdown('<h3 style="text-align: center;">User YAML Preview</h1>', unsafe_allow_html=True)
+
 st.code(yaml_stream.getvalue(), language='yaml')
 
-# --- ACTION BUTTONS ---
 submit_label = "Submit & Create PR" if st.session_state.warehouse_mode == "create" else "Update & Raise PR"
 col_submit, col_delete = st.columns([2, 1])
 
-# --- SUBMIT ---
 if st.button(submit_label):
     if not wh_name.strip():
         st.error("Warehouse Name is required.")
@@ -144,7 +139,6 @@ if st.button(submit_label):
         except Exception as e:
             st.error(f"Failed to create PR: {e}")
 
-# --- DELETE ---
 if st.session_state.warehouse_mode == "edit" and wh_info:
     with col_delete:
         if st.button("Delete Warehouse", type="secondary"):
