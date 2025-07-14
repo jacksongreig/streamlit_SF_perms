@@ -31,7 +31,7 @@ with col2:
 
 st.markdown("---")
 
-st.markdown(f"<h3 style='text-align: center;'>{'Create' if st.session_state.warehouse_mode == 'create' else 'Edit'}</h3>", unsafe_allow_html=True)
+st.markdown(f"<h3 style='text-align: center;'>{'Create New Warehouse' if st.session_state.warehouse_mode == 'create' else 'Edit Current Warehouse'}</h3>", unsafe_allow_html=True)
 
 @st.cache_data
 def get_existing_warehouses():

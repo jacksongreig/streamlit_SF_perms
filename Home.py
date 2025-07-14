@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(
     page_title="Snowflake IaC Assistant",
-    page_icon="🧑‍🧒",
+    page_icon="",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -41,10 +41,18 @@ st.markdown("""
         color: white !important;
     }
 
-    .stButton > button:active {
-        background-color: #001f3f !important;
-        color: white !important;
-    }
+    .stButton > button {
+    width: 100%;
+    min-height: 100px;
+    background-color: #003366 !important;
+    color: white !important;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none !important;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
     </style>
 """, unsafe_allow_html=True)
 

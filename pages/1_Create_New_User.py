@@ -3,10 +3,13 @@ from snowflake.snowpark.context import get_active_session
 from ruamel.yaml import YAML
 from io import StringIO
 from utils.shared_css import inject_shared_css
-from utils.github_integration import raise_github_pr
+from utils.github_integration import raise_github_pr, read_users_yml_from_github
+
+# ------------------------ Page Setup ------------------------
 
 st.set_page_config(page_title="Users", layout="centered", initial_sidebar_state="collapsed")
 inject_shared_css()
+
 session = get_active_session()
 yaml = YAML()
 yaml.indent(mapping=2, sequence=4, offset=2)
@@ -14,6 +17,8 @@ yaml.default_flow_style = False
 
 if "user_mode" not in st.session_state:
     st.session_state.user_mode = "create"
+
+# ------------------------ Title & Mode Switch ------------------------
 
 st.markdown('<h1 style="text-align: center;">Users</h1>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
@@ -28,6 +33,8 @@ with col2:
 
 st.markdown("---")
 st.markdown(f"<h3 style='text-align: center;'>{'Create New User' if st.session_state.user_mode == 'create' else 'Edit Existing User'}</h3>", unsafe_allow_html=True)
+
+# ------------------------ Load Existing Users ------------------------
 
 @st.cache_data
 def get_existing_users():
@@ -70,6 +77,8 @@ if st.session_state.user_mode == "edit":
     if selected_user:
         user_info = get_user_details(selected_user)
 
+# ------------------------ Form Layout ------------------------
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -86,8 +95,8 @@ with col2:
     user_type = st.selectbox("*User Type", ["PERSON", "SERVICE"])
     is_service = user_type == "SERVICE"
 
-    first_name = st.text_input("*First Name", value="" if is_service else "", disabled=is_service)
-    last_name = st.text_input("*Last Name", value="" if is_service else "", disabled=is_service)
+    first_name = st.text_input("*First Name", value="", disabled=is_service)
+    last_name = st.text_input("*Last Name", value="", disabled=is_service)
     middle_name = st.text_input("Middle Name (optional)", disabled=is_service)
     network_policy = st.text_input("Network Policy (optional)")
     owner = st.text_input("*Owner", value=user_info.get("owner", "ACCOUNTADMIN"))
@@ -96,6 +105,8 @@ with col2:
 
 rsa_public_key = st.text_input("RSA Public Key (optional)")
 comment = st.text_area("Comment (optional)")
+
+# ------------------------ YAML Construction ------------------------
 
 display_name = display_name_input.strip()
 if not display_name and first_name.strip() and last_name.strip():
@@ -117,26 +128,29 @@ user_data = {
     "type": user_type,
     "login_name": name.strip(),
 }
+
 if user_type == "PERSON":
     user_data["first_name"] = first_name.strip()
     user_data["last_name"] = last_name.strip()
     user_data["middle_name"] = middle_name.strip() or None
     user_data["must_change_password"] = must_change_password
-    user_data["password"] = password.strip()
+    if password.strip():
+        user_data["password"] = password.strip()
 
 user_data_cleaned = {k: v for k, v in user_data.items() if v is not None}
 
-st.markdown("---")
+# ------------------------ YAML Preview ------------------------
 
+st.markdown("---")
 yaml_stream = StringIO()
 yaml.dump({"users": [user_data_cleaned]}, yaml_stream)
 
-st.markdown('<h3 style="text-align: center;">User YAML Preview</h1>', unsafe_allow_html=True)
-
+st.markdown('<h3 style="text-align: center;">User YAML Preview</h3>', unsafe_allow_html=True)
 st.code(yaml_stream.getvalue(), language="yaml")
 
+# ------------------------ GitHub PR Submission ------------------------
+
 def submit_to_github():
-    from utils.github_integration import read_users_yml_from_github
     existing_str = read_users_yml_from_github()
     existing_yaml = yaml.load(existing_str) if existing_str else {"users": []}
 
@@ -152,16 +166,16 @@ def submit_to_github():
 
     final_yaml_stream = StringIO()
     yaml.dump({"users": users}, final_yaml_stream)
-    try:
-        pr_url = raise_github_pr(
-            filename="users.yaml",
-            file_contents=final_yaml_stream.getvalue(),
-            token=st.secrets["GITHUB_TOKEN"],
-            repo_name=st.secrets["GITHUB_REPO"]
-        )
-        st.success(f"PR created: [View PR]({pr_url})")
-    except Exception as e:
-        st.error(f"Failed to raise PR: {e}")
+
+    pr_url = raise_github_pr(
+        filename="users.yaml",
+        file_contents=final_yaml_stream.getvalue(),
+        token=st.secrets["GITHUB_TOKEN"],
+        repo_name=st.secrets["GITHUB_REPO"]
+    )
+    return pr_url
+
+# ------------------------ Action Buttons ------------------------
 
 if st.session_state.user_mode == "create":
     if st.button("Submit & Raise PR", use_container_width=True):
@@ -172,25 +186,40 @@ if st.session_state.user_mode == "create":
         elif user_type == "PERSON" and not password.strip():
             st.error("Password is required for PERSON users.")
         else:
-            submit_to_github()
+            try:
+                pr_url = submit_to_github()
+                st.success(f"PR created: [View PR]({pr_url})")
+            except Exception as e:
+                st.error(f"Failed to raise PR: {e}")
 else:
     col_submit, col_delete = st.columns(2)
+
     with col_submit:
         if st.button("Update User & Raise PR", use_container_width=True):
-            submit_to_github()
+            try:
+                pr_url = submit_to_github()
+                st.success(f"PR updated: [View PR]({pr_url})")
+            except Exception as e:
+                st.error(f"Failed to raise PR: {e}")
 
     with col_delete:
         if selected_user and st.button("Delete User & Raise PR", use_container_width=True):
             try:
+                delete_stream = StringIO()
+                yaml.dump({"users": [{"name": selected_user, "action": "delete"}]}, delete_stream)
+                file_contents = delete_stream.getvalue()
+
                 pr_url = raise_github_pr(
                     filename="users.yaml",
-                    file_contents=yaml.dump({"users": [{"name": selected_user, "action": "delete"}]}, StringIO()).getvalue(),
+                    file_contents=file_contents,
                     token=st.secrets["GITHUB_TOKEN"],
                     repo_name=st.secrets["GITHUB_REPO"]
                 )
                 st.success(f"Delete PR created: [View PR]({pr_url})")
             except Exception as e:
                 st.error(f"Failed to raise delete PR: {e}")
+
+# ------------------------ Footer ------------------------
 
 st.markdown("---", unsafe_allow_html=True)
 st.markdown("""
