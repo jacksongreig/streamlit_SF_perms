@@ -26,7 +26,7 @@ st.markdown("""
 
     .stButton > button {
         width: 100%;
-        min-height: 80px;
+        min-height: 100px;
         background-color: #003366 !important;
         color: white !important;
         font-size: 1.1rem;
@@ -40,19 +40,6 @@ st.markdown("""
         background-color: #005599 !important;
         color: white !important;
     }
-
-    .stButton > button {
-    width: 100%;
-    min-height: 100px;
-    background-color: #003366 !important;
-    color: white !important;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border: none !important;
-    border-radius: 10px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
     </style>
 """, unsafe_allow_html=True)
 
@@ -71,17 +58,17 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Users"):
-        st.switch_page("pages/1_Create_New_User.py")
+        st.switch_page("pages/1_Users.py")
 
     if st.button("Warehouses"):
-        st.switch_page("pages/3_Add_Warehouse.py")
+        st.switch_page("pages/3_Warehouses.py")
 
 with col2:
     if st.button("Roles"):
-        st.switch_page("pages/2_Add_Role.py")
+        st.switch_page("pages/2_Roles.py")
 
     if st.button("Grants"):
-        st.switch_page("pages/4_Add_Grant.py")
+        st.switch_page("pages/4_Grants.py")
 
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("""
