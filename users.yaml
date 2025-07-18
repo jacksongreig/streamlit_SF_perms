@@ -1,0 +1,14 @@
+users:
+  - name: TEST
+    default_role: PUBLIC
+    default_warehouse: COMPUTE_WH
+    disabled: false
+    display_name: TEST
+    email: ''
+    owner: ACCOUNTADMIN
+    type: PERSON
+    login_name: TEST
+    first_name: TEST
+    last_name: TEST
+    must_change_password: true
+    password: '123'
