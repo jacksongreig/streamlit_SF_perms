@@ -146,3 +146,5 @@ st.markdown("""
         © 2025 Created by Practiv
     </div>
 """, unsafe_allow_html=True)
+
+st.image("logo_practiv.png", use_container_width=True)

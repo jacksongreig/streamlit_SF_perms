@@ -3,7 +3,7 @@ from snowflake.snowpark.context import get_active_session
 from ruamel.yaml import YAML
 from io import StringIO
 from utils.shared_css import inject_shared_css
-from utils.github_integration import raise_github_pr, read_users_yml_from_github
+from utils.github import raise_github_pr
 
 # ------------------------ Page Setup ------------------------
 
@@ -150,28 +150,28 @@ st.code(yaml_stream.getvalue(), language="yaml")
 
 # ------------------------ GitHub PR Submission ------------------------
 
-def submit_to_github():
-    existing_str = read_users_yml_from_github()
-    existing_yaml = yaml.load(existing_str) if existing_str else {"users": []}
+@st.cache_resource
+def fetch_github_secrets():
+    # TEMP fallback for dev until SYSTEM$GET_SECRET works
+    import os
+    import json
+    return json.dumps({
+        "username": os.getenv("GITHUB_PAT", "<your-token-here>"),
+        "password": os.getenv("GITHUB_REPO", "jacksongreig/streamlit_SF_perms")
+    })
 
-    users = existing_yaml.get("users", [])
-    found = False
-    for i, user in enumerate(users):
-        if user["name"] == user_data_cleaned["name"]:
-            users[i] = user_data_cleaned
-            found = True
-            break
-    if not found:
-        users.append(user_data_cleaned)
 
-    final_yaml_stream = StringIO()
-    yaml.dump({"users": users}, final_yaml_stream)
+def submit_to_github(yaml_string):
+    import json
+    secret_obj = json.loads(fetch_github_secrets())
+    github_token = secret_obj["username"]
+    github_repo = secret_obj["password"]
 
     pr_url = raise_github_pr(
         filename="users.yaml",
-        file_contents=final_yaml_stream.getvalue(),
-        token=st.secrets["GITHUB_TOKEN"],
-        repo_name=st.secrets["GITHUB_REPO"]
+        file_contents=yaml_string,
+        token=github_token,
+        repo_name=github_repo
     )
     return pr_url
 
@@ -187,7 +187,7 @@ if st.session_state.user_mode == "create":
             st.error("Password is required for PERSON users.")
         else:
             try:
-                pr_url = submit_to_github()
+                pr_url = submit_to_github(yaml_stream.getvalue())
                 st.success(f"PR created: [View PR]({pr_url})")
             except Exception as e:
                 st.error(f"Failed to raise PR: {e}")
@@ -197,7 +197,7 @@ else:
     with col_submit:
         if st.button("Update User & Raise PR", use_container_width=True):
             try:
-                pr_url = submit_to_github()
+                pr_url = submit_to_github(yaml_stream.getvalue())
                 st.success(f"PR updated: [View PR]({pr_url})")
             except Exception as e:
                 st.error(f"Failed to raise PR: {e}")
@@ -207,14 +207,7 @@ else:
             try:
                 delete_stream = StringIO()
                 yaml.dump({"users": [{"name": selected_user, "action": "delete"}]}, delete_stream)
-                file_contents = delete_stream.getvalue()
-
-                pr_url = raise_github_pr(
-                    filename="users.yaml",
-                    file_contents=file_contents,
-                    token=st.secrets["GITHUB_TOKEN"],
-                    repo_name=st.secrets["GITHUB_REPO"]
-                )
+                pr_url = submit_to_github(delete_stream.getvalue())
                 st.success(f"Delete PR created: [View PR]({pr_url})")
             except Exception as e:
                 st.error(f"Failed to raise delete PR: {e}")
@@ -227,3 +220,5 @@ st.markdown("""
         © 2025 Created by Practiv
     </div>
 """, unsafe_allow_html=True)
+
+st.image("logo_practiv.png", use_container_width=True)

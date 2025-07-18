@@ -72,3 +72,13 @@ with st.container():
                 st.session_state["grants_list"] = []  # Clear list after PR
             except Exception as e:
                 st.error(f"Failed to create PR: {e}")
+
+# ── Footer ────────────────────────────────────────────
+st.markdown("---", unsafe_allow_html=True)
+st.markdown("""
+    <div style='text-align: center; color: grey; font-size: 0.85rem; padding: 1rem 0;'>
+        © 2025 Created by Practiv
+    </div>
+""", unsafe_allow_html=True)
+
+st.image("logo_practiv.png", use_container_width=True)

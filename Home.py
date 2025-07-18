@@ -7,6 +7,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+st.image("IaC_logo.png", use_container_width=True)
+
 st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
@@ -46,7 +48,7 @@ st.markdown("""
 with st.container():
     st.markdown("""
         <div class="home-container">
-            <div style="font-size: 4rem;">🧑‍🧒</div>
+            <div style="font-size: 4rem;"></div>
             <h1>Snowflake IaC Assistant</h1>
             <p>This tool helps you manage Snowflake users, roles, warehouses, and grants via Infrastructure as Code (IaC).</p>
         </div>
@@ -73,6 +75,8 @@ with col2:
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("""
     <div style='text-align: center; color: grey; font-size: 0.85rem; padding: 1rem 0;'>
-        © 2025 Created by Practiv
+        © 2025 Created by
     </div>
 """, unsafe_allow_html=True)
+
+st.image("logo_practiv.png", use_container_width=True)
